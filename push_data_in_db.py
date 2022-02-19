@@ -6,11 +6,11 @@ test = get_data('Examples/Beispiel-Datensätze/test.csv')
 train = get_data('Examples/Beispiel-Datensätze/train.csv')
 ideal = get_data('Examples/Beispiel-Datensätze/ideal.csv')
 
-
-engine = db.create_engine('sqlite:////test.sqlite')
-
+engine = db.create_engine('sqlite:///test.sqlite')
 conn = engine.connect()
 
-meta_data = db.MetaData()
+meta = db.MetaData()
 
-ideal_table = db.Table(test)
+# search for tables in databse to delete them, before creating a new table
+for tbl in reversed(meta.sorted_tables):
+    engine.execute(tbl.delete())
