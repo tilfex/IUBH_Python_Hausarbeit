@@ -1,5 +1,14 @@
 import sqlalchemy as db
-from data_import import get_data
+import csv
+
+# creating a function to open, read, to save a csv-file into a list of dictionaries
+def get_data(filename):
+    result = []
+    with open(filename, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            result.append(row)
+    return(result)
 
 # create an engine-object
 engine = db.create_engine('sqlite:///Hausarbeit_db.sqlite')
@@ -10,14 +19,18 @@ conn = engine.connect()
 # create a metadate-object
 meta = db.MetaData()
 
-conn.execute('DROP TABLE IF EXISTS Test_Tabelle')
+# deleting the tables if they existed before the code was running
 conn.execute('DROP TABLE IF EXISTS Train_Tabelle')
 conn.execute('DROP TABLE IF EXISTS Ideal_Tabelle')
 
+# put the location of the csv-files into al variable for easier use
+train_file = 'Examples/Beispiel-Datensätze/train.csv'
+ideal_file = 'Examples/Beispiel-Datensätze/ideal.csv'
+test_file = 'Examples/Beispiel-Datensätze/test.csv'
+
 # with the function get_data the data of the csv files will be putted into lists of dictionaries
-test = get_data('Examples/Beispiel-Datensätze/test.csv')
-train = get_data('Examples/Beispiel-Datensätze/train.csv')
-ideal = get_data('Examples/Beispiel-Datensätze/ideal.csv')
+train = get_data(train_file)
+ideal = get_data(ideal_file)
 
 #create a function to get the names of the columns into a list
 def get_column_names(dataset):
@@ -42,7 +55,6 @@ def create_table(column_list, tablename):
     )
 
 # creating all tables with the created functions
-test_table = create_table(create_columns(get_column_names(test)), "Test_Tabelle")
 train_table = create_table(create_columns(get_column_names(train)), "Train_Tabelle")
 ideal_table = create_table(create_columns(get_column_names(ideal)), "Ideal_Tabelle")
 
@@ -62,6 +74,5 @@ def insert_data(table, data_list):
     return(res)
 
 # inserting the data into the tables with the created function
-insert_test = insert_data(test_table, test)
 insert_train = insert_data(train_table, train)
 insert_ideal = insert_data(ideal_table, ideal)
