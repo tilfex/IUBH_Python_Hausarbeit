@@ -1,5 +1,5 @@
 import unittest
-from data_import import get_data as gd
+from push_data_in_db import get_data as gd
 
 class UnitTestCsvFile(unittest.TestCase):
     def test_get_data(self):

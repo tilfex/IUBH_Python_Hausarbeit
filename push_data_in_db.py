@@ -20,8 +20,8 @@ conn = engine.connect()
 meta = db.MetaData()
 
 # deleting the tables if they existed before the code was running
-conn.execute('DROP TABLE IF EXISTS Train_Tabelle')
-conn.execute('DROP TABLE IF EXISTS Ideal_Tabelle')
+conn.execute('DROP TABLE IF EXISTS Training_Daten_Tabelle')
+conn.execute('DROP TABLE IF EXISTS Ideale_Funktionen_Tabelle')
 
 # put the location of the csv-files into al variable for easier use
 train_file = 'Examples/Beispiel-Datensätze/train.csv'
@@ -55,8 +55,8 @@ def create_table(column_list, tablename):
     )
 
 # creating all tables with the created functions
-train_table = create_table(create_columns(get_column_names(train)), "Train_Tabelle")
-ideal_table = create_table(create_columns(get_column_names(ideal)), "Ideal_Tabelle")
+train_table = create_table(create_columns(get_column_names(train)), "Training_Daten_Tabelle")
+ideal_table = create_table(create_columns(get_column_names(ideal)), "Ideale_Funktionen_Tabelle")
 
 # save the metadata-object
 meta.create_all(engine)
