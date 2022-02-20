@@ -1,8 +1,6 @@
-from cmath import sqrt
-from more_itertools import difference
 import pandas as pd
 import numpy as np
-from push_data_in_db import train_file, ideal_file, test_file
+from push_data_in_db import train_file, ideal_file, test_file, create_table
 
 # create function to create a dataframe with an user defined exception handling
 def create_dataframe(csv_file):
@@ -36,9 +34,9 @@ for i in ideal_df_wo_x.columns:
     # for each ideal function we loop through the training data columns
     for k in train_df_wo_x.columns:
         train_col = train_df_wo_x.loc[:,k]
-        # for each column of the ideal functions, we calculate the differnces to each training data clolumn and square these
-        df_sq_train[k]= np.square(ideal_col-train_col)
-    # in the following the sum of all squared differences are calculated, so we get one number for each ideal-training-pair
+        # for each column of the ideal functions, we calculate the differnces to each training data column and square these
+        df_sq_train[k] = np.square(ideal_col-train_col)
+    # in the following the sum of all squared differences are calculated, so we get one column for each ideal-training-pair
     df_sum_sq_diff[i] = df_sq_train.sum()
 # afterwards the sum of all training-data results is calculated,
 # so we get to see the sum of all squared differences for each ideal function
@@ -61,7 +59,7 @@ df_chosen_ideal = ideal_df.loc[:, list_four_ideal]
 def push_ideal_function_in_df(column_number):
     df_chosen_ideal_x = pd.DataFrame()
     df_chosen_ideal_x ['x'] = df_chosen_ideal ['x']
-    df_chosen_ideal_x ['y'] = df_chosen_ideal.iloc[:, column_number]
+    df_chosen_ideal_x [list(df_chosen_ideal.columns.values.tolist())[column_number]] = df_chosen_ideal.iloc[:, column_number]
     return(df_chosen_ideal_x)
 
 df_ideal_1 = push_ideal_function_in_df(1)
@@ -78,12 +76,15 @@ test_df_wo_x = test_df.iloc[:, 1]
 # create a list of the x-values to filter the needed x-values from the ideal-functions
 x_values = {'x': list(test_df['x'])}
 
-#now we get the needed data from the ideal functions
+#now we get the needed data from the ideal functions  
+# 
+# 
+# DO I STILL NEED THIS????
 df_x_test_ideal = pd.DataFrame()
 df_x_test_ideal = df_chosen_ideal[df_chosen_ideal.isin(x_values).any(1)]
 
-# define a function to get the sum of the squared difference betweet the test-data and one ideal-function
-def get_squared_diff_test_ideal(df_ideal_num):
+# define a function to get the differences between the test-data and one ideal-function
+def get_diff_test_ideal(df_ideal_num):
     df_right = pd.DataFrame()
     df_right['x']=test_df['x']
     df_left = pd.DataFrame()
@@ -92,17 +93,53 @@ def get_squared_diff_test_ideal(df_ideal_num):
     df_right = df_right.merge(df_left, on='x', how='left')
     df_right.sort_values(by='x', inplace=True)
     df_right_wo_x = df_right.iloc[:, 1]
-    df_sq_test_ideal= np.square(df_right_wo_x-test_df_wo_x)
-    df_sq_test_ideal_sum_diff = df_sq_test_ideal.sum()
-    return (df_sq_test_ideal_sum_diff)
+    df_diff_test_ideal= (df_right_wo_x-test_df_wo_x)
+    return (df_diff_test_ideal)
+# for the criteria to check if the max of differences ideal-test is not bigger than the squareroot of 2 times the max difference
+# between ideal-training we get the max difference of each pair und get the positive value of it
+# first we get the max of the ideal-test pair
+test_ideal_max_diff_1 = max(np.absolute((get_diff_test_ideal(df_ideal_1))))
+test_ideal_max_diff_2 = max(np.absolute((get_diff_test_ideal(df_ideal_2))))
+test_ideal_max_diff_3 = max(np.absolute((get_diff_test_ideal(df_ideal_3))))
+test_ideal_max_diff_4 = max(np.absolute((get_diff_test_ideal(df_ideal_4))))
 
-sq_diff_test_ideal_1 = get_squared_diff_test_ideal(df_ideal_1)
-sq_diff_test_ideal_2 = get_squared_diff_test_ideal(df_ideal_2)
-sq_diff_test_ideal_3 = get_squared_diff_test_ideal(df_ideal_3)
-sq_diff_test_ideal_4 = get_squared_diff_test_ideal(df_ideal_4)
+# now we get the max of the ideal-training pair ,therefore we define a function which gives us the searched values
+def get_diff_train_ideal(df_ideal_num):
+    df_diff_train_ideal = pd.DataFrame()
+    df_ideal_num_wo_x = df_ideal_num.iloc[:, 1]
+    max_diff = []
+    for i in train_df_wo_x.columns:
+        train_column = train_df_wo_x.loc[:,i]
+        df_diff_train_ideal[i] = np.absolute(df_ideal_num_wo_x-train_column)
+        max_diff.append(max(df_diff_train_ideal[i]))
+    max_diff = max(max_diff)
+    return (max_diff)
 
-print(sq_diff_test_ideal_1*sqrt(2))
-print(sq_diff_test_ideal_2*sqrt(2))
-print(sq_diff_test_ideal_3*sqrt(2))
-print(sq_diff_test_ideal_4*sqrt(2))
-print(df_least_square)
+# with the defined function we get the max of the ideal_train pairs
+train_ideal_max_diff_1 = get_diff_train_ideal(df_ideal_1)
+train_ideal_max_diff_2 = get_diff_train_ideal(df_ideal_2)
+train_ideal_max_diff_3 = get_diff_train_ideal(df_ideal_3)
+train_ideal_max_diff_4 = get_diff_train_ideal(df_ideal_4)
+
+# now we define a function, which checks if the acquirement of if the max of differences ideal-test is not bigger than 
+# the squareroot of 2 times the max difference between ideal-training and afterwards a table should be created with the data
+def acquirement_check_create_csv(train_diff_num, test_diff_num, df_ideal_num, column_number, filename):
+    if test_diff_num > np.sqrt(2)*train_diff_num:
+        return 
+    else:
+        df_for_csv = pd.DataFrame()
+        df_for_csv = test_df
+        df_for_csv ['Delya Y (Abweichung)'] = np.absolute(get_diff_test_ideal(df_ideal_num))
+        df_right = pd.DataFrame()
+        df_right['x']=test_df['x']
+        df_left = pd.DataFrame()
+        df_left['x']=df_ideal_num['x']
+        df_left[list(df_chosen_ideal.columns.values.tolist())[column_number]]=df_ideal_num.iloc[:, 1]
+        df_right = df_right.merge(df_left, on='x', how='left')
+        df_right.sort_values(by='x', inplace=True)
+        df_for_csv [list(df_chosen_ideal.columns.values.tolist())[column_number]] = df_right[list(df_chosen_ideal.columns.values.tolist())[column_number]]
+        df_for_csv.to_csv(filename)
+    # print(df_for_csv)
+x=acquirement_check_create_csv(train_ideal_max_diff_1, test_ideal_max_diff_1, df_ideal_1, 1, 'abc.csv')
+# print(get_diff_test_ideal(df_ideal_1))
+
