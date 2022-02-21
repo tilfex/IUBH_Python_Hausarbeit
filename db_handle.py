@@ -3,12 +3,17 @@ import csv
 import settings
 
 class ConnectDatabase(object):
-    """
-    
+    """ 
+    Handles the connection with the database.
+
+    Attributes:
+        engine: return-value of create_engine of sqlalchemy
+        conn: a connection-handle from engine
+        meta: meta of sqlalchemy database
     """
     def __init__(self):
-        """
-        
+        """ 
+        Initializes the class.
         """
         self.engine = None
         self.conn = None
@@ -16,7 +21,7 @@ class ConnectDatabase(object):
 
     def _connect(self):
         """
-        
+        Builds a connection to the database.
         """
         # create an engine-object
         self.engine = db.create_engine('sqlite:///' + settings.DB_LOCATION)
@@ -27,14 +32,14 @@ class ConnectDatabase(object):
     
     def _close_connect(self):
         """
-        
+        Saves the changes and close the connection to the database.
         """
         self.meta.create_all(self.engine)
         self.conn.close()
 
 class NewTable(ConnectDatabase):
     """
-    
+    Creates a new table from a csv-file.
     """
     def __init__(self, file_location, tablename):
         self.file_location = file_location
