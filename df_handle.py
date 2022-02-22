@@ -30,6 +30,7 @@ class DataframeHandle(pd.DataFrame):
             print(err)
             print('Datei existiert nicht, oder es handelt sich nicht um eine .csv-Datei')
             print('Das Programm wird beendet')
+            exit()
     
     def create_df_wo_x(self):
         """

@@ -25,7 +25,7 @@ class IdealFunc(object):
         name: the name of a column
         df: a dataframe for a ideal-function
     """
-    def __init__(self, name):
+    def __init__(self, triple):
         """ 
         Initializes the class.
 
@@ -34,8 +34,10 @@ class IdealFunc(object):
         """
         self.testdata = TestData()
         self.traindata = TrainData()
+        self.triple = triple
         
-        self.name = name
+        self.name = triple[1]
+        self.max_diff_ideal_train = triple[2]
         self.df = None
 
         self._init_ideal_df()
@@ -56,10 +58,11 @@ class IdealFunc(object):
         curr_df[self.name] = self.ideal_df[self.name]
         self.df = curr_df
     
-    def _get_diff_with_test(self):
+    def compare_ideal_test(self):
         """
-        Calculates the differences between a ideal-function and the testdata.
+        Calculates the differences between one of the chosen ideal-function and the testdata.
 
+        x(test)  y(ideal)  y(test) diff
         Returns:
             res: An array containing the differences
         """
@@ -68,88 +71,40 @@ class IdealFunc(object):
         
         df_left = pd.DataFrame()
         df_left['x'] = self.df['x']
-        df_left['y'] = self.df.iloc[:, 1]
+        df_left['Y (Ideal Funktion)'] = self.df.iloc[:, 1]
         
         df_right = df_right.merge(df_left, on='x', how='left')
-        df_right_wo_x = df_right.iloc[:, 1]
-        testdata_wo_x = self.testdata.df.iloc[:, 1]
-        res = np.array(df_right_wo_x) - np.array(testdata_wo_x)
-        return res
-    
-    def _get_max_diff_with_test(self):
-        """
-        Gives the max difference between an ideal-function and the 
-        test-data.
+        df_right['Y1 (Test Funktion)'] = self.testdata.df['y']
+        df_right['Delta Y (Abweichung)'] = np.absolute(df_right['Y1 (Test Funktion)'] - df_right['Y (Ideal Funktion)'])
 
-        Returns:
-            Max difference between an ideal-function and the 
-            test-data
-        """
-        return max(np.absolute(self._get_diff_with_test()))
-    
-    def _get_diff_with_train(self):
-        """
-        Calculates the differences between an ideal-function and all 
-        training-data.
+        # The following line add name of ideal function into the dataframe,
+        # as per task description (tabelle 3)
+        # df.shape[0] gets the number of rows in a dataframe
+        df_right['Nummer der Idealen Funktion'] = [self.name]*df_right.shape[0]
 
-        Returns:
-            diffs: A dataframe of the differences between an ideal-function and 
-            all training-data
-        """
-        ideal_func = self.df.iloc[:, 1]
-        diffs = []
-        for j in self.traindata.df_wo_x.columns:
-            train_column = self.traindata.df_wo_x.loc[:, j]
-            curr_diffs = np.absolute(ideal_func - train_column)
-            diffs.append(curr_diffs)
-        return diffs
-    
-    def _get_max_diff_with_train(self):
-        """
-        Gives the max difference between an ideal-function and all 
-        training-data.
 
-        Returns:
-            Max difference between an ideal-function and all 
-            training-data
-        """
-        return np.max(self._get_diff_with_train())
-    
-    def is_meeting_criteria(self):
-        """
-        Checks, if the criteria - the max difference between training-data and
-        the ideal-function times the squareroot of two, is not allowed to be
-        smaller than the max difference between test-data and the 
-        ideal-function - is satisfied. 
+        # The following line creates a new column in df_right, named as criteria
+        # The data in this criteria column is:
+        # When number in column `Delta Y (Abweichung)` is smaller than sqrt(2)*max_diff_ideal_train
+        # the data in criteria column is True, else it's False
+        df_right['criteria'] = df_right.loc[:, 'Delta Y (Abweichung)'] < np.sqrt(2) * self.max_diff_ideal_train
 
-        Returns:
-            Boolean to tell if the criteria is satisfied
-        """
-        train_ideal_diff = self._get_max_diff_with_train()
-        test_ideal_diff = self._get_max_diff_with_test()
-        
-        if test_ideal_diff > np.sqrt(2) * train_ideal_diff:
-            return False
-        else:
-            return True
-    
+        # The following line creates another dataframe, which is a slice of df_right.
+        # The new dataframe contains rows from df_right, only when:
+        # The `criteria` data in this row is True
+        # Here the `lambda df: df['criteria'] == True` is the same as:
+        # def filter(df):
+        #   return df['criteria'] == True
+        # That is, it's a function that returns true, only when the criteria value is True.
+        self.diff_df = df_right.loc[lambda df: df['criteria'] == True, :]
+        return self.diff_df
+
+
+
     def save_to_csv(self, filename):
         """
         Saves the test-data, the fitting ideal-function and the difference 
         between these in a csv-file, if the criteria of 'is_meeting_criteria()'
         is satisfied.
         """
-        if self.is_meeting_criteria() is not True:
-            raise Exception("Anforderung wurde nicht erfüllt")
-
-        df = self.testdata.df.copy(deep=True)
-        df['Delya Y (Abweichung)'] = self._get_diff_with_test()
-
-        df_right = pd.DataFrame()
-        df_right['x'] = self.testdata.df['x']
-        df_left = self.df.copy(deep=True)
-        df_right = df_right.merge(df_left, on='x', how='left')
-        df_right = df_right.reset_index()
-        df = df.reset_index()
-        df[self.name] = df_right[self.name]
-        df.to_csv(filename, index=False)
+        self.diff_df.to_csv(filename, index=False)
