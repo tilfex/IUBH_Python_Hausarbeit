@@ -1,9 +1,10 @@
+"""
+Calls all classes which are needed to sovle the Python Tasks.
+"""
 from db_handle import NewTable
 from train_data import TrainData
 from ideal_func import IdealFunc
 import settings
-
-
 
 # Create tables in db, insert training-data, test-data and ideal-functions
 table_train = NewTable(

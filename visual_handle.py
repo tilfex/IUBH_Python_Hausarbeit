@@ -5,12 +5,22 @@ from df_handle import DataframeHandle
 
 class VisualHandle():
     """
-    In this class the visualisation of the data in the Database is handled
+    Handles the visualisation of the data in the Database.
+
+    Attributes:
+        csv_file_name: the path to the csv-file
+        title: title of the grafic
+        df: dataframe of the data to visualize
     """
 
     def __init__(self, csv_file_name, title):
         """
-        
+        Initializes the class.
+
+        Arguments:
+            csv_file_name: the path to the csv-file
+            title: title of the grafic
+            df: dataframe of the data to visualize
         """
         self.csv_file_name = csv_file_name
         self.title = title
@@ -18,7 +28,8 @@ class VisualHandle():
 
     def plot_single_matplot(self):
         """
-        df = dataframe for visualisation
+        Plots a grafic for a single x-y-pair using a scatter-style, with 
+        matplotlib.
         """
         df = DataframeHandle(self.csv_file_name)
         for i in df.columns[1:]:
@@ -28,7 +39,8 @@ class VisualHandle():
 
     def plot_compare_matplot(self):
         """
-        
+        Plots a grafic with one two x-y-pair with the same x-values using a 
+        scatter-style and one x-y-pair using a bar-style, with matplotlib.
         """
         df = DataframeHandle(self.csv_file_name)
         x = df['x'].tolist()
@@ -37,13 +49,14 @@ class VisualHandle():
         y_diff = df[df.columns.values[2]].tolist()
         plt.scatter(x, y_test, marker = ".", color="green", label= "Test")
         plt.scatter(x, y_ideal, marker = ".", color="orange", label= "Ideal")
-        plt.bar(x, y_diff, width = 0.5, color = "#cccccc", alpha=0.6, label= "Abweichung")
+        plt.bar(x, y_diff, width = 0.5, color = "#cccccc", alpha=0.6, \
+            label= "Abweichung")
         plt.legend()
         plt.show()
     
     def plot_single_bokeh(self):
         """
-        
+        Plots a grafic for a single x-y-pair using a circle-style, with bokeh.
         """
         df = DataframeHandle(self.csv_file_name)
         
