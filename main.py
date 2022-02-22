@@ -4,13 +4,8 @@ from ideal_func import IdealFunc
 import settings
 
 
-td = TrainData()
-selected_ideal_funcs = td.get_selected_ideal_funcs()
-for (ind, func_name) in enumerate(selected_ideal_funcs):
-    func = IdealFunc(func_name)
-    func.save_to_csv(f'compare_diff_{ind+1}.csv')
 
-# Load data into database
+# Create tables in db, insert training-data, test-data and ideal-functions
 table_train = NewTable(
     file_location=settings.TRAIN_DATA_PATH,
     tablename="Training_Daten_Tabelle")
@@ -23,7 +18,14 @@ table_test = NewTable(
     file_location=settings.TEST_DATA_PATH,
     tablename="Test_Daten_Tabelle")
 
-# create the tables
+# Create csv-files with the results of the compare of test- and ideal-data
+td = TrainData()
+selected_ideal_funcs = td.get_selected_ideal_funcs()
+for (ind, func_name) in enumerate(selected_ideal_funcs):
+    func = IdealFunc(func_name)
+    func.save_to_csv(f'compare_diff_{ind+1}.csv')
+
+# Create tables in db, insert results of the compare of test- and ideal-datas
 comp_table_1 = NewTable(
     file_location="compare_diff_1.csv",
     tablename="Tabelle_Vergleich_1_Idealfunktion"
@@ -40,5 +42,3 @@ comp_table_4 = NewTable(
     file_location="compare_diff_4.csv",
     tablename="Tabelle_Vergleich_4_Idealfunktion"
 )
-
-
