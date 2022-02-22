@@ -63,7 +63,6 @@ class VisualHandle():
         for i in df.columns[1:]:
             plot = figure(width=500, height=500, title=self.title, \
                 x_axis_label= "x axis", y_axis_label= "y axis")
-            print(i)
             y = df[i].tolist()
             x = df['x'].tolist()
             plot.circle(x=x, y=y)
@@ -72,7 +71,8 @@ class VisualHandle():
 
     def plot_compare_bokeh(self):
         """
-        
+        Plots a grafic with one two x-y-pair with the same x-values using a 
+        circle-style and one x-y-pair using a bar-style, with bokeh.
         """
         df = DataframeHandle(self.csv_file_name)
         plot = figure(width=500, height=500, title=self.title, \

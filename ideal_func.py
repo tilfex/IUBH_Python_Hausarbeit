@@ -152,5 +152,4 @@ class IdealFunc(object):
         df_right = df_right.reset_index()
         df = df.reset_index()
         df[self.name] = df_right[self.name]
-        print(df)
         df.to_csv(filename, index=False)
