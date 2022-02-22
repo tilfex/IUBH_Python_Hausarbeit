@@ -23,11 +23,8 @@ class ConnectDatabase(object):
         """
         Builds a connection to the database.
         """
-        # create an engine-object
         self.engine = db.create_engine('sqlite:///' + settings.DB_LOCATION)
-        # create a connection to the database
         self.conn = self.engine.connect()
-        # create a metadate-object
         self.meta = db.MetaData()
     
     def _close_connect(self):
@@ -40,14 +37,24 @@ class ConnectDatabase(object):
 class NewTable(ConnectDatabase):
     """
     Creates a new table from a csv-file.
+
+    Attributes:
+        file_location: path to the csv-file
+        tablename: name of the table which will be loaded into the sql-database
+        table: table in ths sql-database the data should be inserted in
     """
     def __init__(self, file_location, tablename):
+        """ 
+        Initializes the class.
+
+        Arguments:
+            file_location: path to the csv-file
+            tablename: name of the table which will be loaded into the sql-database
+        """
+        super().__init__()
         self.file_location = file_location
         self.tablename = tablename
         self.table = None
-        self.engine = None
-        self.conn = None
-        self.meta = None
 
         self._connect()
         self._clean_db()
@@ -56,10 +63,18 @@ class NewTable(ConnectDatabase):
         self._close_connect()
     
     def _clean_db(self):
-        # deleting the tables if they existed before the code was running
+        """
+        Deletes the tables if they existed before the code was running.
+        """
         self.conn.execute('DROP TABLE IF EXISTS ' + self.tablename)
     
     def _get_data(self):
+        """
+        Opens the csv-file and puts the data into the list 'result'.
+
+        Returns:
+            result: list of the data from the csv-file
+        """
         result = []
         with open(self.file_location, 'r') as csvfile:
             reader = csv.reader(csvfile)
@@ -67,8 +82,10 @@ class NewTable(ConnectDatabase):
                 result.append(row)
         return(result)
     
-    #create a function to create a table with the needed columns
     def create_table(self):
+        """
+        Creates a table with the needed columns.
+        """
         data_list=[]
         for i in self._get_data()[0]:
             data_list.append(i)
@@ -82,8 +99,10 @@ class NewTable(ConnectDatabase):
         self.meta.create_all(self.engine)
     
     def insert_data(self):
+        """
+        Inserts the data into a table in the sql-database.
+        """
         data = self._get_data()
-        
         sql_query = db.insert(self.table)
         data_dict_list = []
         for i in data[1:]:
