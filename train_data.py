@@ -1,23 +1,34 @@
 import settings
 from df_handle import DataframeHandle
-import pandas as pd
 import numpy as np
-
-
 
 class TrainData(object):
     """
-    
+    Selects the best fitting ideal-function for each training-dataset.
+
+    Attributes:
+        df:             A dataframe containing the trainingdata
+        df_wo_x:        A dataframe containing the trainingdata without the 
+                        x-column
+        ideal_df:       A dataframe containing the idea-functions
+        ideal_df_wo_x:  A dataframe containing the idea-functions without the 
+                        x-column
     """
-    def __init__(self):
-        self.df = DataframeHandle(settings.TRAIN_DATA_PATH)
+
+    def __init__(self, train_data_path=settings.TRAIN_DATA_PATH, ideal_data_path=settings.IDEAL_DATA_PATH):
+        """ 
+        Initializes the class.
+
+        Arguments:
+            ideal_data_path: Path to ideal data csv file
+            train_data_path: Path to train data csv file
+        """
+        self.df = DataframeHandle(train_data_path)
         self.df_wo_x = self.df.create_df_wo_x()
-        self._init_ideal_df()
-    
-    def _init_ideal_df(self):
-        self.ideal_df = DataframeHandle(settings.IDEAL_DATA_PATH)
+
+        self.ideal_df = DataframeHandle(ideal_data_path)
         self.ideal_df_wo_x = self.ideal_df.create_df_wo_x()
-    
+
     def get_selected_ideal_funcs(self):
         """
         Selects the best fitting ideal-function for each training-dataset.
@@ -48,6 +59,6 @@ class TrainData(object):
                     max_diff = curr_max_diff
                 else:
                     continue
-            train_ideal_triple = (i,name_chosen_ideal, max_diff)
+            train_ideal_triple = (i, name_chosen_ideal, max_diff)
             list_triples.append(train_ideal_triple)
         return list_triples

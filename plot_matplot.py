@@ -2,24 +2,32 @@
 Plots the needed matplotlib-plots for the task
 """
 from visual_handle import VisualHandle
-from settings import TRAIN_DATA_PATH, TEST_DATA_PATH
+from settings import IDEAL_DATA_PATH
 
-# show the grafics for each training-data x-y-pair
-training_data = VisualHandle(TRAIN_DATA_PATH, "Traingsdaten")
-training_data.plot_single_matplot()
+# show the grafics for each training-data/ideal-function-pair
+comp_train_ideal_1 = VisualHandle(
+    IDEAL_DATA_PATH, "Vergleich Traingsdaten-Idealfunktion", 1)
+comp_train_ideal_1.plot_train_ideal_matplot()
+comp_train_ideal_2 = VisualHandle(
+    IDEAL_DATA_PATH, "Vergleich Traingsdaten-Idealfunktion", 2)
+comp_train_ideal_2.plot_train_ideal_matplot()
+comp_train_ideal_3 = VisualHandle(
+    IDEAL_DATA_PATH, "Vergleich Traingsdaten-Idealfunktion", 3)
+comp_train_ideal_3.plot_train_ideal_matplot()
+comp_train_ideal_4 = VisualHandle(
+    IDEAL_DATA_PATH, "Vergleich Traingsdaten-Idealfunktion", 4)
+comp_train_ideal_4.plot_train_ideal_matplot()
 
-# show the grafics for the test-data x-y-pair
-training_data = VisualHandle(TEST_DATA_PATH, "Testdaten")
-training_data.plot_single_matplot()
-
-
-# show the grafics for each compare between the chisen idealfunction and the 
-# test-data
-compare_1 = VisualHandle("compare_diff_1.csv", "")
-compare_1.plot_compare_matplot()
-compare_2 = VisualHandle("compare_diff_2.csv", "")
-compare_2.plot_compare_matplot()
-compare_3 = VisualHandle("compare_diff_3.csv", "")
-compare_3.plot_compare_matplot()
-compare_4 = VisualHandle("compare_diff_4.csv", "")
-compare_4.plot_compare_matplot()
+# show the grafics for the testdata/ideal-frunction-pair
+test_to_ideal_1 = VisualHandle(
+    IDEAL_DATA_PATH, "Vergleich Testdaten-Idealfunktion", 1)
+test_to_ideal_1.plot_test_ideal_matplot()
+test_to_ideal_2 = VisualHandle(
+    IDEAL_DATA_PATH, "Vergleich Testdaten-Idealfunktion", 2)
+test_to_ideal_2.plot_test_ideal_matplot()
+test_to_ideal_3 = VisualHandle(
+    IDEAL_DATA_PATH, "Vergleich Testdaten-Idealfunktion", 3)
+test_to_ideal_3.plot_test_ideal_matplot()
+test_to_ideal_4 = VisualHandle(
+    IDEAL_DATA_PATH, "Vergleich Testdaten-Idealfunktion", 4)
+test_to_ideal_4.plot_test_ideal_matplot()

@@ -7,10 +7,11 @@ class ConnectDatabase(object):
     Handles the connection with the database.
 
     Attributes:
-        engine: return-value of create_engine of sqlalchemy
-        conn: a connection-handle from engine
-        meta: meta of sqlalchemy database
+        engine:     Return-value of create_engine of sqlalchemy
+        conn:       A connection-handle from engine
+        meta:       Meta of sqlalchemy database
     """
+
     def __init__(self):
         """ 
         Initializes the class.
@@ -26,7 +27,7 @@ class ConnectDatabase(object):
         self.engine = db.create_engine('sqlite:///' + settings.DB_LOCATION)
         self.conn = self.engine.connect()
         self.meta = db.MetaData()
-    
+
     def _close_connect(self):
         """
         Saves the changes and close the connection to the database.
@@ -39,17 +40,21 @@ class NewTable(ConnectDatabase):
     Creates a new table from a csv-file.
 
     Attributes:
-        file_location: path to the csv-file
-        tablename: name of the table which will be loaded into the sql-database
-        table: table in ths sql-database the data should be inserted in
+        file_location:  Path to the csv-file
+        tablename:      Name of the table which will be loaded into the 
+                        sql-database
+        table:          Table in ths sql-database the data should be inserted 
+                        in
     """
+
     def __init__(self, file_location, tablename):
         """ 
         Initializes the class.
 
         Arguments:
-            file_location: path to the csv-file
-            tablename: name of the table which will be loaded into the sql-database
+            file_location:  Path to the csv-file
+            tablename:      Name of the table which will be loaded into the 
+                            sql-database
         """
         super().__init__()
         self.file_location = file_location
@@ -61,13 +66,13 @@ class NewTable(ConnectDatabase):
         self.create_table()
         self.insert_data()
         self._close_connect()
-    
+
     def _clean_db(self):
         """
         Deletes the tables if they existed before the code was running.
         """
         self.conn.execute('DROP TABLE IF EXISTS ' + self.tablename)
-    
+
     def _get_data(self):
         """
         Opens the csv-file and puts the data into the list 'result'.
@@ -81,15 +86,15 @@ class NewTable(ConnectDatabase):
             for row in reader:
                 result.append(row)
         return(result)
-    
+
     def create_table(self):
         """
         Creates a table with the needed columns.
         """
-        data_list=[]
+        data_list = []
         for i in self._get_data()[0]:
             data_list.append(i)
-        column_list =[]
+        column_list = []
         for i in data_list:
             column = db.Column(i, db.Integer, nullable=False)
             column_list.append(column)
@@ -97,7 +102,7 @@ class NewTable(ConnectDatabase):
             self.tablename, self.meta,
             *column_list)
         self.meta.create_all(self.engine)
-    
+
     def insert_data(self):
         """
         Inserts the data into a table in the sql-database.
@@ -108,9 +113,6 @@ class NewTable(ConnectDatabase):
         for i in data[1:]:
             data_dict = {}
             for (ind, item) in enumerate(i):
-                data_dict.update({data[0][ind]:item})
+                data_dict.update({data[0][ind]: item})
             data_dict_list.append(data_dict)
         self.conn.execute(sql_query, data_dict_list)
-
-
-    

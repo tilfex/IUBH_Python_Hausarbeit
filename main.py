@@ -28,19 +28,19 @@ for (ind, triple) in enumerate(list_triples):
     func.save_to_csv(f'compare_diff_{ind+1}.csv')
 
 # Create tables in db, insert results of the compare of test- and ideal-datas
-# comp_table_1 = NewTable(
-#     file_location="compare_diff_1.csv",
-#     tablename="Tabelle_Vergleich_1_Idealfunktion"
-# )
-# comp_table_2 = NewTable(
-#     file_location="compare_diff_2.csv",
-#     tablename="Tabelle_Vergleich_2_Idealfunktion"
-# )
-# comp_table_3 = NewTable(
-#     file_location="compare_diff_3.csv",
-#     tablename="Tabelle_Vergleich_3_Idealfunktion"
-# )
-# comp_table_4 = NewTable(
-#     file_location="compare_diff_4.csv",
-#     tablename="Tabelle_Vergleich_4_Idealfunktion"
-# )
+comp_table_1 = NewTable(
+    file_location="compare_diff_1.csv",
+    tablename="Tabelle_Vergleich_1_Idealfunktion"
+)
+comp_table_2 = NewTable(
+    file_location="compare_diff_2.csv",
+    tablename="Tabelle_Vergleich_2_Idealfunktion"
+)
+comp_table_3 = NewTable(
+    file_location="compare_diff_3.csv",
+    tablename="Tabelle_Vergleich_3_Idealfunktion"
+)
+comp_table_4 = NewTable(
+    file_location="compare_diff_4.csv",
+    tablename="Tabelle_Vergleich_4_Idealfunktion"
+)
