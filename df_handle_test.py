@@ -6,9 +6,6 @@ class TestDataframeHandle(unittest.TestCase):
         with self.assertRaises(SystemExit):
             df = DataframeHandle("nonexist")
 
-        with self.assertRaises(SystemExit):
-            df = DataframeHandle("testdata/test_df_3.csv")
-
     def test_create_df_wo_x(self):
         df = DataframeHandle("testdata/test_df_1.csv")
         df.create_df_wo_x()
