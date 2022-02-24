@@ -102,7 +102,7 @@ class IdealFunc(object):
         # The data in this criteria column is:
         # When number in column `Delta Y (Abweichung)` is smaller than sqrt(2)*max_diff_ideal_train
         # the data in criteria column is True, else it's False
-        df_right['criteria'] = df_right.loc[:, 'Delta Y (Abweichung)'] < np.sqrt(
+        df_right['criteria'] = df_right.loc[:, 'Delta Y (Abweichung)'] <= np.sqrt(
             2) * self.max_diff_ideal_train
 
         # The following line creates another dataframe, which is a slice of df_right.
